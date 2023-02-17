@@ -12,9 +12,13 @@ class AnimatedSquare extends StatefulWidget {
 class _AnimatedSquareState extends State<AnimatedSquare>
     with SingleTickerProviderStateMixin {
   late AnimationController animationController;
-  late Animation<double> rotation;
   late Animation<double> opacity;
+  late Animation<double> opacityOut;
+  late Animation<double> moveToLeft;
   late Animation<double> moveToRight;
+  late Animation<double> moveToUp;
+  late Animation<double> moveToDown;
+  late Animation<double> rotation;
   late Animation<double> scale;
 
   @override
@@ -24,7 +28,7 @@ class _AnimatedSquareState extends State<AnimatedSquare>
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(
-        milliseconds: 4000,
+        milliseconds: 4500,
       ),
     );
 
@@ -52,13 +56,73 @@ class _AnimatedSquareState extends State<AnimatedSquare>
       ),
     );
 
-    moveToRight = Tween(
+    opacityOut = Tween(
       begin: 0.0,
-      end: 200.0,
+      end: 1.0,
     ).animate(
       CurvedAnimation(
         parent: animationController,
-        curve: Curves.easeOut,
+        curve: const Interval(
+          0.75,
+          1.0,
+          curve: Curves.easeOut,
+        ),
+      ),
+    );
+
+    moveToRight = Tween(
+      begin: 0.0,
+      end: 100.0,
+    ).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: const Interval(
+          0.0,
+          0.25,
+          curve: Curves.bounceOut,
+        ),
+      ),
+    );
+
+    moveToUp = Tween(
+      begin: 0.0,
+      end: -100.0,
+    ).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: const Interval(
+          0.25,
+          0.50,
+          curve: Curves.bounceOut,
+        ),
+      ),
+    );
+
+    moveToLeft = Tween(
+      begin: 0.0,
+      end: 100.0,
+    ).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: const Interval(
+          0.50,
+          0.75,
+          curve: Curves.bounceOut,
+        ),
+      ),
+    );
+
+    moveToDown = Tween(
+      begin: 0.0,
+      end: -100.0,
+    ).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: const Interval(
+          0.75,
+          1.0,
+          curve: Curves.bounceOut,
+        ),
       ),
     );
 
@@ -74,7 +138,7 @@ class _AnimatedSquareState extends State<AnimatedSquare>
 
     animationController.addListener(() {
       if (animationController.isCompleted) {
-        animationController.reverse();
+        animationController.repeat();
       }
     });
   }
@@ -95,8 +159,8 @@ class _AnimatedSquareState extends State<AnimatedSquare>
       builder: (BuildContext context, Widget? childSquare) {
         return Transform.translate(
           offset: Offset(
-            moveToRight.value,
-            0,
+            moveToRight.value - moveToLeft.value,
+            moveToUp.value - moveToDown.value,
           ),
           child: Transform.rotate(
             angle: rotation.value,
